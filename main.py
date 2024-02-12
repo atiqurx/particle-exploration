@@ -1,8 +1,9 @@
 import pandas as pd
-from vpython import canvas, sphere, rate, vector, color, curve, box, text
+from vpython import canvas, sphere, rate, vector, color, curve, box
 
 # importing dataset 
 df = pd.read_csv("sample_0_ptrac.csv")
+total_iterations = len(df)
 
 # canvas
 scene = canvas(title="Particle Path Visualization", width=1000, height=600)
@@ -19,32 +20,37 @@ wallB = box(pos=vector(0, -side, 0), size=vector(s3, thk, s3), color=color.blue)
 wallT = box(pos=vector(0, side, 0), size=vector(s3, thk, s3), color=color.blue)
 wallBK = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color=color.gray(0.7))
 
-current_particle = None
+# Initialize variables for particle tracking
+particle_counter = 0  
+particle_dict = {}  # Dictionary to store particles with their IDs
+particle_records = []  # List to store particle records
+
+
+# Initialize the particle trail
 current_trail = curve(color=color.green, radius=0.3)
 
-# tracking the visited path
-visited_positions = set()
-
+# Iterate over the dataset
 for index, row in df.iterrows():
+    # Extract data from the row
     x = row['X']
     y = row['Y']
     z = row['Z']
     u = row['U']  # cosine of x-axis direction
     v = row['V']  # cosine of y-axis direction
     w = row['W']  # cosine of z-axis direction
-    time = row['Time']  # Time for shaking at the position
-    event_type = row['Type'] # get the event type of particle
+    time = row['Time']  
+    event_type = row['Type']  # get the event type of particle
 
     # Update position based on directional cosines
     scale = 15
 
     # Handle different event types
-    if event_type == 1000:  # Source (new particle spawn)
-        current_particle = sphere(pos=vector(x, y, z), radius=1, color=color.yellow)
-
-    elif event_type == 2000:  # New particle created
-        current_particle = sphere(pos=vector(x, y, z), radius=1, color=color.red)
-
+    if event_type == 1000 or event_type == 2000:  # Source & new particle spawn
+        particle_counter += 1  
+        particle_id = particle_counter  
+        particle_dict[particle_id] = sphere(pos=vector(x, y, z), radius=1, color=color.yellow if event_type == 1000 else color.red)  
+        current_trail = curve(color=color.green, radius=0.3)  
+        
     elif event_type == 3000:  # Surface crossed
         pass
 
@@ -52,18 +58,25 @@ for index, row in df.iterrows():
         pass 
 
     elif event_type == 5000:  # Termination
-        if current_particle is not None:
-            current_particle.visible = False
-            current_particle = None
-            current_trail.clear()
+        for particle_id, particle in particle_dict.items():
+            if particle is not None:
+                particle.visible = False  
+        current_trail.clear()  
+        
+    particle_records.append({'ID': particle_id, 'Type': event_type, 'X': x, 'Y': y, 'Z': z, 'Time': time})  
 
     # Update particle position
-    if current_particle is not None and event_type != 5000:
-        current_particle.pos = vector(x, y, z) + vector(u, v, w) * scale
-        current_trail.append(current_particle.pos)
-    
-    
-    rate(10)
+    if particle_id in particle_dict:
+        particle = particle_dict[particle_id]
+        particle.pos = vector(x, y, z) + vector(u, v, w) * scale
+        current_trail.append(particle.pos)
 
-print("End")
+        # print(particle_records[-1]["Time"])
+    
+    rate(1)
+
+    # Check if all iterations are completed
+    if index + 1 == total_iterations:
+        print("End")
+        break  
 
