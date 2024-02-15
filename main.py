@@ -4,7 +4,6 @@ from vpython import canvas, sphere, rate, vector, color, curve, box
 # importing dataset 
 df = pd.read_csv("sample_0_ptrac.csv")
 total_iterations = len(df)
-
 # canvas
 scene = canvas(title="Particle Path Visualization", width=1000, height=600)
 
@@ -20,18 +19,27 @@ wallB = box(pos=vector(0, -side, 0), size=vector(s3, thk, s3), color=color.blue)
 wallT = box(pos=vector(0, side, 0), size=vector(s3, thk, s3), color=color.blue)
 wallBK = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color=color.gray(0.7))
 
-# Initialize variables for particle tracking
-particle_counter = 0  
-particle_dict = {}  # Dictionary to store particles with their IDs
-particle_records = []  # List to store particle records
 
+class Particle:
+    def __init__(self, id, type, x, y, z, u, v, w, time, sphere=None):
+        self.id = id
+        self.type = type
+        self.x = x
+        self.y = y
+        self.z = z
+        self.u = u
+        self.v = v 
+        self.w = w
+        self.time = time
+        self.sphere = sphere
 
-# Initialize the particle trail
+particle_entries = {}
+spheres = {} # spheres are mapped to particle ids 
+particle_counter = 0  # used for assign particle id
 current_trail = curve(color=color.green, radius=0.3)
 
-# Iterate over the dataset
+# setting paticle id
 for index, row in df.iterrows():
-    # Extract data from the row
     x = row['X']
     y = row['Y']
     z = row['Z']
@@ -41,42 +49,50 @@ for index, row in df.iterrows():
     time = row['Time']  
     event_type = row['Type']  # get the event type of particle
 
-    # Update position based on directional cosines
-    scale = 15
-
-    # Handle different event types
-    if event_type == 1000 or event_type == 2000:  # Source & new particle spawn
+    # set a particle id for each new particle
+    if event_type == 1000 or event_type == 2000: 
         particle_counter += 1  
-        particle_id = particle_counter  
-        particle_dict[particle_id] = sphere(pos=vector(x, y, z), radius=1, color=color.yellow if event_type == 1000 else color.red)  
-        current_trail = curve(color=color.green, radius=0.3)  
+        particle_id = particle_counter 
+        spheres[particle_id] = sphere(visible = False, radius=1, color=color.yellow if event_type == 1000 else color.red)
+
+    particle_entries[index] = Particle(particle_id, event_type, x, y, z, u, v, w, time, spheres[particle_id])
+
+
+# Group the DataFrame by the "Time" column
+grouped_df = df.groupby('Time')
+sorted_groups = {time: group.sort_values(by='Time') for time, group in grouped_df}
+mapped_indexes = {time: group.index.tolist() for time, group in sorted_groups.items()} # Map indexes to sorted time values
+
+
+for time, indexes in mapped_indexes.items():
+    for idx in indexes:
+
+        particle = particle_entries[idx] 
+
+        x = particle.x
+        y = particle.y
+        z = particle.z
+        u = particle.u
+        v = particle.v
+        w = particle.w
+        event_type = particle.type
         
-    elif event_type == 3000:  # Surface crossed
-        pass
+        # Update position based on directional cosines
+        scale = 15
+        pos = vector(x, y, z) + vector(u, v, w) * scale
 
-    elif event_type == 4000:  # Collision
-        pass 
+        particle.sphere.visible = True
 
-    elif event_type == 5000:  # Termination
-        for particle_id, particle in particle_dict.items():
-            if particle is not None:
-                particle.visible = False  
-        current_trail.clear()  
-        
-    particle_records.append({'ID': particle_id, 'Type': event_type, 'X': x, 'Y': y, 'Z': z, 'Time': time})  
+        particle.sphere.pos = pos
 
-    # Update particle position
-    if particle_id in particle_dict:
-        particle = particle_dict[particle_id]
-        particle.pos = vector(x, y, z) + vector(u, v, w) * scale
-        current_trail.append(particle.pos)
+        if event_type == 5000:  # Termination
+            particle.sphere.visible = False  
+            current_trail.clear()
 
-        # print(particle_records[-1]["Time"])
-    
-    rate(1)
+        current_trail.append(pos)
 
-    # Check if all iterations are completed
-    if index + 1 == total_iterations:
-        print("End")
-        break  
+        rate(1)
+
+
+  
 
