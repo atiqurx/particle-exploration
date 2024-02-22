@@ -20,20 +20,7 @@ wallT = box(pos=vector(0, side, 0), size=vector(s3, thk, s3), color=color.blue)
 wallBK = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color=color.gray(0.7))
 
 
-class Particle:
-    def __init__(self, id, type, x, y, z, u, v, w, time, sphere=None):
-        self.id = id
-        self.type = type
-        self.x = x
-        self.y = y
-        self.z = z
-        self.u = u
-        self.v = v 
-        self.w = w
-        self.time = time
-        self.sphere = sphere
-
-particle_entries = {}
+particle_entries = {} # ids are mapped to indexes
 spheres = {} # spheres are mapped to particle ids 
 particle_counter = 0  # used for assign particle id
 current_trail = curve(color=color.green, radius=0.3)
@@ -43,50 +30,54 @@ for index, row in df.iterrows():
     x = row['X']
     y = row['Y']
     z = row['Z']
-    u = row['U']  # cosine of x-axis direction
-    v = row['V']  # cosine of y-axis direction
-    w = row['W']  # cosine of z-axis direction
-    time = row['Time']  
-    event_type = row['Type']  # get the event type of particle
+    event_type = row['Type']  
 
     # set a particle id for each new particle
     if event_type == 1000 or event_type == 2000: 
         particle_counter += 1  
         particle_id = particle_counter 
-        spheres[particle_id] = sphere(visible = False, radius=1, color=color.yellow if event_type == 1000 else color.red)
+        spheres[particle_id] = sphere(visible = False, pos = vector(x,y,z), radius=1, color=color.yellow if event_type == 1000 else color.red)
 
-    particle_entries[index] = Particle(particle_id, event_type, x, y, z, u, v, w, time, spheres[particle_id])
+    particle_entries[index] = particle_id
 
 
 # Group the DataFrame by the "Time" column
 grouped_df = df.groupby('Time')
 sorted_groups = {time: group.sort_values(by='Time') for time, group in grouped_df}
-mapped_indexes = {time: group.index.tolist() for time, group in sorted_groups.items()} # Map indexes to sorted time values
+mapped_indexes = {time: group.index.tolist() for time, group in sorted_groups.items()} 
 
 
 for time, indexes in mapped_indexes.items():
     for idx in indexes:
 
-        particle = particle_entries[idx] 
+        particle_id = particle_entries[idx]
+        particle = spheres[particle_id] 
 
-        x = particle.x
-        y = particle.y
-        z = particle.z
-        u = particle.u
-        v = particle.v
-        w = particle.w
-        event_type = particle.type
+        x = df.loc[idx, 'X']
+        y = df.loc[idx, 'Y']
+        z = df.loc[idx, 'Z']
+        u = df.loc[idx, 'U']
+        v = df.loc[idx, 'V']
+        w = df.loc[idx, 'W']
+        event_type = df.loc[idx, 'Type']
         
         # Update position based on directional cosines
         scale = 15
         pos = vector(x, y, z) + vector(u, v, w) * scale
 
-        particle.sphere.visible = True
+        particle.visible = True
 
-        particle.sphere.pos = pos
+        # smooth animation
+        steps = 10
+        step_vector = (pos - particle.pos) / steps
+        for _ in range(steps):
+            particle.pos += step_vector
+            rate(30)
+
+        particle.pos = pos
 
         if event_type == 5000:  # Termination
-            particle.sphere.visible = False  
+            particle.visible = False  
             current_trail.clear()
 
         current_trail.append(pos)
