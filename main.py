@@ -3,7 +3,7 @@ from vpython import canvas, sphere, rate, vector, color, curve, box
 
 # importing dataset 
 df = pd.read_csv("sample_0_ptrac.csv")
-total_iterations = len(df)
+
 # canvas
 scene = canvas(title="Particle Path Visualization", width=1000, height=600)
 
@@ -23,7 +23,6 @@ wallBK = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color=color.gray
 particle_entries = {} # ids are mapped to indexes
 spheres = {} # spheres are mapped to particle ids 
 particle_counter = 0  # used for assign particle id
-current_trail = curve(color=color.green, radius=0.3)
 
 # setting paticle id
 for index, row in df.iterrows():
@@ -36,7 +35,7 @@ for index, row in df.iterrows():
     if event_type == 1000 or event_type == 2000: 
         particle_counter += 1  
         particle_id = particle_counter 
-        spheres[particle_id] = sphere(visible = False, pos = vector(x,y,z), radius=1, color=color.yellow if event_type == 1000 else color.red)
+        spheres[particle_id] = sphere(visible = False, pos = vector(x,y,z), radius=1, make_trail=True, trail_radius=0.2, trail_color=color.green, color=color.yellow if event_type == 1000 else color.red)
 
     particle_entries[index] = particle_id
 
@@ -77,13 +76,7 @@ for time, indexes in mapped_indexes.items():
         particle.pos = pos
 
         if event_type == 5000:  # Termination
-            particle.visible = False  
-            current_trail.clear()
-
-        current_trail.append(pos)
+            particle.visible = False 
+            particle.clear_trail()
 
         rate(1)
-
-
-  
-
