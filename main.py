@@ -1,5 +1,5 @@
 import pandas as pd
-from vpython import canvas, sphere, rate, vector, color, curve, box
+from vpython import canvas, sphere, rate, vector, color, curve, box, label
 
 # importing dataset 
 df = pd.read_csv("sample_0_ptrac.csv")
@@ -39,6 +39,8 @@ for index, row in df.iterrows():
 
     particle_entries[index] = particle_id
 
+# Label for coordinates
+info_label = label(pos=vector(120, 120, 0), text='', height=16, border=6, font='sans')
 
 # Group the DataFrame by the "Time" column
 grouped_df = df.groupby('Time')
@@ -60,9 +62,9 @@ for time, indexes in mapped_indexes.items():
         w = df.loc[idx, 'W']
         event_type = df.loc[idx, 'Type']
         
-        # Update position based on directional cosines
-        scale = 15
-        pos = vector(x, y, z) + vector(u, v, w) * scale
+        # Update position based on directional cosines  + vector(u, v, w)
+        scale = 1.2
+        pos = vector(x, y, z)  * scale
 
         particle.visible = True
 
@@ -78,5 +80,8 @@ for time, indexes in mapped_indexes.items():
         if event_type == 5000:  # Termination
             particle.visible = False 
             particle.clear_trail()
+        
+        # Update label
+        info_label.text = f'Index: {idx}\nParticle ID: {particle_id}\nEvent Type: {event_type}\nCoordinates: ({x:.2f}, {y:.2f}, {z:.2f})'
 
         rate(1)
