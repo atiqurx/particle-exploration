@@ -1,5 +1,6 @@
 import pandas as pd
 from vpython import canvas, sphere, rate, vector, color, curve, box, label
+import time
 
 # importing dataset 
 df = pd.read_csv("sample_0_ptrac.csv")
@@ -23,6 +24,7 @@ wallBK = box(pos=vector(0, 0, -side), size=vector(s2, s2, thk), color=color.gray
 particle_entries = {} # ids are mapped to indexes
 spheres = {} # spheres are mapped to particle ids 
 particle_counter = 0  # used for assign particle id
+scale = 1.2
 
 # setting paticle id
 for index, row in df.iterrows():
@@ -35,7 +37,7 @@ for index, row in df.iterrows():
     if event_type == 1000 or event_type == 2000: 
         particle_counter += 1  
         particle_id = particle_counter 
-        spheres[particle_id] = sphere(visible = False, pos = vector(x,y,z), radius=1, make_trail=True, trail_radius=0.2, trail_color=color.green, color=color.yellow if event_type == 1000 else color.red)
+        spheres[particle_id] = sphere(visible = False, pos = vector(x,y,z) * scale, radius=1, make_trail=True, trail_radius=0.2, trail_color=color.green, color=color.yellow if event_type == 1000 else color.red)
 
     particle_entries[index] = particle_id
 
@@ -47,6 +49,7 @@ grouped_df = df.groupby('Time')
 sorted_groups = {time: group.sort_values(by='Time') for time, group in grouped_df}
 mapped_indexes = {time: group.index.tolist() for time, group in sorted_groups.items()} 
 
+time.sleep(2)
 
 for time, indexes in mapped_indexes.items():
     for idx in indexes:
@@ -62,18 +65,10 @@ for time, indexes in mapped_indexes.items():
         w = df.loc[idx, 'W']
         event_type = df.loc[idx, 'Type']
         
-        # Update position based on directional cosines  + vector(u, v, w)
-        scale = 1.2
+        # scale the coordiantes
         pos = vector(x, y, z)  * scale
 
         particle.visible = True
-
-        # smooth animation
-        steps = 10
-        step_vector = (pos - particle.pos) / steps
-        for _ in range(steps):
-            particle.pos += step_vector
-            rate(30)
 
         particle.pos = pos
 
@@ -84,4 +79,4 @@ for time, indexes in mapped_indexes.items():
         # Update label
         info_label.text = f'Index: {idx}\nParticle ID: {particle_id}\nEvent Type: {event_type}\nCoordinates: ({x:.2f}, {y:.2f}, {z:.2f})'
 
-        rate(1)
+    rate(10)
