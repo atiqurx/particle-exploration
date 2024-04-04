@@ -34,6 +34,18 @@ surface_parameters = {
     623: -27.5, # Side surface of Front Fe1, Fe2, BA1 
     631: 20, # Generator side surface of BA1             
     641: 15, # Generator side surface of Front Fe2  / Detector side surface Side Fe_BA
+    711: -31, # Generator side surface of Side Fe   
+    712: -35, # outside surface of Side Fe3   
+    713: -32.5, # inside surface of Side Fe3   
+    714: -27.5, # outside surface of Side BA2
+    715: -17.5, # inside surface of Side BA2   
+    716: -15, # inside surface of Side Fe4   
+    721: 15, # inside surface of Side Fe5   
+    722: 17.5, # outside surface of Side Fe5   
+    723: 27.5, # outside surface of Side BA2
+    724: 32.5, # inside surface of Side Fe6   
+    725: 35, # outside surface of Side Fe6   
+    73 : -57, # Generator side surface of Side BA
 
 }
 soil_dimensions = {
@@ -122,6 +134,66 @@ fe2_dimensions = {
 
 fe2 = box(pos=vector(20, 0 , 60), # need to check if the position is correct
                    size=vector(fe2_dimensions['x'], fe2_dimensions['y'], fe2_dimensions['z']),
+                   color=color.red)
+
+fe3_dimensions = {
+    'x': surface_parameters[631] - surface_parameters[711],
+    'y': surface_parameters[712] - surface_parameters[713],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe3 = box(pos=vector(-8, 35 , 60), # need to check if the position is correct
+                   size=vector(fe3_dimensions['x'], fe3_dimensions['y'], fe3_dimensions['z']),
+                   color=color.red)
+
+ba2_dimensions = {
+    'x': surface_parameters[641] - surface_parameters[73],
+    'y': surface_parameters[714] - surface_parameters[715],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+ba2 = box(pos=vector(-18.5, 22.5 , 60), # need to check if the position is correct
+                   size=vector(ba2_dimensions['x'], ba2_dimensions['y'], ba2_dimensions['z']),
+                   color=color.green)
+
+fe4_dimensions = {
+    'x': surface_parameters[631] - surface_parameters[711],
+    'y': surface_parameters[712] - surface_parameters[713],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe4 = box(pos=vector(-8, 16.25, 60), # need to check if the position is correct
+                   size=vector(fe4_dimensions['x'], fe4_dimensions['y'], fe4_dimensions['z']),
+                   color=color.red)
+
+fe5_dimensions = {
+    'x': surface_parameters[641] - surface_parameters[711],
+    'y': surface_parameters[721] - surface_parameters[722],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe5 = box(pos=vector(-8, -16.25, 60), # need to check if the position is correct
+                   size=vector(fe4_dimensions['x'], fe4_dimensions['y'], fe4_dimensions['z']),
+                   color=color.red)
+
+ba3_dimensions = {
+    'x': surface_parameters[641] - surface_parameters[73],
+    'y': surface_parameters[722] - surface_parameters[723],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+ba3 = box(pos=vector(-18.5, -22.5 , 60), # need to check if the position is correct
+                   size=vector(ba3_dimensions['x'], ba3_dimensions['y'], ba3_dimensions['z']),
+                   color=color.green)
+
+fe6_dimensions = {
+    'x': surface_parameters[641] - surface_parameters[711],
+    'y': surface_parameters[724] - surface_parameters[725],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe6 = box(pos=vector(-8, -35 , 60), # need to check if the position is correct
+                   size=vector(fe6_dimensions['x'], fe6_dimensions['y'], fe6_dimensions['z']),
                    color=color.red)
 
 # Create x, y, and z axes
