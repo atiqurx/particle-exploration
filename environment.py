@@ -1,9 +1,7 @@
 from vpython import canvas, box, vector, color, rate, arrow
 
 # Define the extracted values from the input file (seed_0.inp)
-cell_number = 20
-material_number = 1
-surface_numbers = [1, 2, 3, 4, 5, 6]
+
 surface_parameters = {
     1: 100,  # px 100
     2: -100,  # px -100
