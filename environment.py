@@ -24,10 +24,16 @@ surface_parameters = {
     # sheilding
     65: 5, # bottom surface of shielding. from MINS field scale scan, bottom is 5cm below neutron target
     66: -15, # top surface of shielding 
+
     611: 40, # Detector side surface of Pb   
     612: 35, # Generator side surface of Pb     
     613: 30.5, # Side surface of Pb      
     614: -30.5, # Side surface of Pb 
+    621: 30, # Generator side surface of Front Fe1      
+    622: 27.5, # Side surface of Front Fe1, Fe2, BA1    
+    623: -27.5, # Side surface of Front Fe1, Fe2, BA1 
+    631: 20, # Generator side surface of BA1             
+    641: 15, # Generator side surface of Front Fe2  / Detector side surface Side Fe_BA
 
 }
 soil_dimensions = {
@@ -38,7 +44,7 @@ soil_dimensions = {
 
 # Create a canvas
 scene = canvas(width=800, height=600)
-scene.background = color.black
+scene.background = color.white
 
 # Create a box to represent the soil volume
 soil_volume = box(pos=vector(0, 0, 0),
@@ -87,6 +93,36 @@ pb_dimensions = {
 pb = box(pos=vector(40 , 0 , 60), # need to check if the position is correct
                    size=vector(pb_dimensions['x'], pb_dimensions['y'], pb_dimensions['z']),
                    color=color.gray(0.5))
+
+fe1_dimensions = {
+    'x': surface_parameters[612] - surface_parameters[621],
+    'y': surface_parameters[622] - surface_parameters[623],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe1 = box(pos=vector(35, 0 , 60), # need to check if the position is correct
+                   size=vector(fe1_dimensions['x'], fe1_dimensions['y'], fe1_dimensions['z']),
+                   color=color.red)
+
+ba1_dimensions = {
+    'x': surface_parameters[621] - surface_parameters[631],
+    'y': surface_parameters[622] - surface_parameters[623],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+ba1 = box(pos=vector(27.5, 0 , 60), # need to check if the position is correct
+                   size=vector(ba1_dimensions['x'], ba1_dimensions['y'], ba1_dimensions['z']),
+                   color=color.green)
+
+fe2_dimensions = {
+    'x': surface_parameters[631] - surface_parameters[641],
+    'y': surface_parameters[622] - surface_parameters[623],
+    'z': surface_parameters[65] - surface_parameters[66]
+}
+
+fe2 = box(pos=vector(20, 0 , 60), # need to check if the position is correct
+                   size=vector(fe2_dimensions['x'], fe2_dimensions['y'], fe2_dimensions['z']),
+                   color=color.red)
 
 # Create x, y, and z axes
 x_axis = arrow(pos=vector(0, 0, 0), axis=vector(500, 0, 0), shaftwidth=1, color=color.red)
