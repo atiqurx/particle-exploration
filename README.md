@@ -42,5 +42,11 @@ The surface number is the first entry. The surface number must begin in columns 
 
 Page 227. Page 260: Table 5.3.1  
 
+RCC: Right Circular Cylinder  
+RCC vx vy vz h1 h2 h3 r  
+The (x, y, z) coordinates at the center of the base for the right circular cylinder. Right circular cylinder axis vector, which provides both the orientation and the height of the cylinder. Radius of cylinder.  
+
+Page 269: Table 5.3.4.4  
+
 ### Data Cards
 The card name must begin within the first five columns. No data card can be used more than once with the same number or particle type designations.  

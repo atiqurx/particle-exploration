@@ -1,4 +1,5 @@
-from vpython import canvas, box, vector, color, rate, arrow
+from vpython import canvas, box, vector, color, rate, arrow, cylinder, compound
+
 
 # Define the extracted values from the input file (seed_0.inp)
 
@@ -46,6 +47,8 @@ surface_parameters = {
     724: 32.5, # inside surface of Side Fe6   
     725: 35, # outside surface of Side Fe6   
     73 : -57, # Generator side surface of Side BA
+
+    # wheels
 
 }
 soil_dimensions = {
@@ -195,6 +198,16 @@ fe6_dimensions = {
 fe6 = box(pos=vector(-8, -35 , 60), # need to check if the position is correct
                    size=vector(fe6_dimensions['x'], fe6_dimensions['y'], fe6_dimensions['z']),
                    color=color.red)
+
+
+# WHEELS
+w1_outer_tread = cylinder(pos=vector(-2, 77, 88), axis=vector(0, 25, 0), radius=29, color=color.yellow, )
+
+w2_outer_tread = cylinder(pos=vector(68, 77, 88), axis=vector(0, 25, 0), radius=29, color=color.yellow)
+
+w3_outer_tread = cylinder(pos=vector(-2, -77, 88), axis=vector(0, 25, 0), radius=29, color=color.yellow)
+
+w4_outer_tread = cylinder(pos=vector(68, -77, 88), axis=vector(0, 25, 0), radius=29, color=color.yellow)
 
 # Create x, y, and z axes
 x_axis = arrow(pos=vector(0, 0, 0), axis=vector(500, 0, 0), shaftwidth=1, color=color.red)

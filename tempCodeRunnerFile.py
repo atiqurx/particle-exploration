@@ -1,1 +1,2 @@
-detector_1
+w1_outer_tread = cylinder(pos=vector(-2, 77, 88), axis=vector(0, 25, 0), radius=29, color=color.yellow)
+inner_tread = cylinder(pos=vector(-2, 77, 88), axis=vector(0, 25, 0), radius=27.7, color=color.white)
